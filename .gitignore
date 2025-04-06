@@ -1,0 +1,9 @@
+# .gitignore
+__pycache__/
+.ipynb_checkpoints/
+.env
+*.pyc
+*.pkl
+*.DS_Store
+data/raw/
+data/processed/
