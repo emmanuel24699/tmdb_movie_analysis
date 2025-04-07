@@ -1,9 +1,10 @@
 import requests
 import pandas as pd
 import json
+from datetime import datetime
 from src.config import TMDB_API_KEY, BASE_URL, MOVIE_IDS
 
-def fetch_movie_data(movie_ids=MOVIE_IDS, save_path="data/raw/movies.json"):
+def fetch_movie_data(movie_ids=MOVIE_IDS, save_path=None):
     """Fetch movie data from TMDb API for given movie IDs, skipping any that return errors."""
     movies = []
     failed_ids = []
@@ -29,9 +30,17 @@ def fetch_movie_data(movie_ids=MOVIE_IDS, save_path="data/raw/movies.json"):
             failed_ids.append(movie_id)
 
     df = pd.DataFrame(movies)
-    
-    if save_path and not df.empty:
+
+    # Generate save path with timestamp if not provided
+    if save_path is None:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        save_path = f"data/raw/movies_{timestamp}.json"
+
+    if not df.empty:
         df.to_json(save_path, orient="records", lines=True)
+        print(f"\n💾 Data saved to {save_path}")
+    else:
+        print("\n⚠️ No data to save.")
 
     print(f"\n✅ Successfully fetched {len(df)} movies.")
     if failed_ids:

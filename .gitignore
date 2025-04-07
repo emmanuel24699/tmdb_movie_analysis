@@ -6,7 +6,6 @@ __pycache__/
 *.pkl
 *.DS_Store
 data/raw/*
-# data/processed/
+data/processed/*
 __init__.py
 data_venv/
-.gitkeep
