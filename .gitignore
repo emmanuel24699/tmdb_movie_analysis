@@ -8,3 +8,5 @@ __pycache__/
 data/raw/*
 # data/processed/
 __init__.py
+data_venv/
+.gitkeep
