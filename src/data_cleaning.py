@@ -161,7 +161,7 @@ def clean_data(df, save_path=None):
     # Save to parquet file if save_path is provided
     if save_path:
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
-        df.to_parquet(save_path, engine='pyarrow', index=False)
+        df.to_parquet(save_path, engine='pyarrow')
         print(f"Cleaned data saved to {save_path}")
     return df
 
