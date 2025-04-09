@@ -2,7 +2,9 @@ import requests
 import pandas as pd
 import json
 from datetime import datetime
+import os
 from src.config import TMDB_API_KEY, BASE_URL, MOVIE_IDS
+
 
 def fetch_movie_data(movie_ids=MOVIE_IDS, save_path=None):
     """Fetch movie data from TMDb API for given movie IDs, skipping any that return errors."""
@@ -31,22 +33,34 @@ def fetch_movie_data(movie_ids=MOVIE_IDS, save_path=None):
 
     df = pd.DataFrame(movies)
 
-    # Generate save path with timestamp if not provided
-    if save_path is None:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        save_path = f"data/raw/movies_{timestamp}.json"
+    # Ensure save directories exist
+    os.makedirs("data/raw", exist_ok=True)
 
+    # Generate save path with timestamp if not provided
     if not df.empty:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        save_path = save_path or f"data/raw/movies_{timestamp}.json"
+
+        # Save the movie data
         df.to_json(save_path, orient="records", lines=True)
         print(f"\n💾 Data saved to {save_path}")
+
+        # Save the latest timestamp for use in cleaning step
+        with open("data/latest_timestamp.txt", "w") as f:
+            f.write(timestamp)
+        print("🕒 Latest timestamp recorded.")
+
     else:
         print("\n⚠️ No data to save.")
 
     print(f"\n✅ Successfully fetched {len(df)} movies.")
     if failed_ids:
         print(f"❌ These movie IDs failed: {failed_ids}")
+
     return df
+
 
 if __name__ == "__main__":
     df = fetch_movie_data()
+    print("\n🔍 Sample of fetched data:")
     print(df.head())
