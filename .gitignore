@@ -9,3 +9,4 @@ data/raw/*
 data/processed/*
 __init__.py
 data_venv/
+data/*
