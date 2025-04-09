@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
-from datetime import datetime
+import os
+
 
 def clean_data(df, save_path=None):
     """Clean and preprocess the movie Dataframe."""
@@ -114,29 +115,29 @@ def clean_data(df, save_path=None):
 
     # Checking and removing duplicates
     num_duplicates = df.duplicated().sum()
-    print(f"🔁 Number of duplicate rows: {num_duplicates}")
+    print(f"Number of duplicate rows: {num_duplicates}")
     df.drop_duplicates(inplace=True)
 
     # Check for "unknown" titles or missing IDs/titles
     unknown_titles = df[df['title'].str.strip().str.lower() == 'unknown']
     missing_id_or_title = df[df['id'].isna() | df['title'].isna()]
-    print(f"🕵️‍♂️ Rows with title='unknown': {len(unknown_titles)}")
-    print(f"❌ Rows with missing id or title: {len(missing_id_or_title)}")
+    print(f"Rows with title='unknown': {len(unknown_titles)}")
+    print(f"Rows with missing id or title: {len(missing_id_or_title)}")
 
     # Drop rows with unknown title or id
     df = df.dropna(subset=['id', 'title'])
     df = df[df['title'].str.strip().str.lower() != 'unknown']
-    print(f"🧼 DataFrame shape after dropping unknown titles: {df.shape}")
+    print(f"DataFrame shape after dropping unknown titles: {df.shape}")
 
     # Keep only rows with at least 10 non-null values
     df = df.dropna(thresh=10)
-    print(f"🧼 Cleaned DataFrame shape after dropping rows with < 10 non-null values: {df.shape}")
+    print(f"Cleaned DataFrame shape after dropping rows with < 10 non-null values: {df.shape}")
 
 
     # Filter to include only 'Released' movies and drop the 'status' column
     df = df[df['status'] == 'Released']
     df.drop(columns='status', inplace=True)
-    print(f"🧼 Cleaned DataFrame shape after filtering for 'Released' movies: {df.shape}")
+    print(f"Cleaned DataFrame shape after filtering for 'Released' movies: {df.shape}")
 
     # Rename columns according to final dataframe structure
     df.rename(columns={
@@ -152,29 +153,26 @@ def clean_data(df, save_path=None):
     ]
 
     df = df[final_columns]
-
-    print(f"🧼 Cleaned DataFrame shape: {df.shape}")
+    print(f"Cleaned DataFrame shape: {df.shape}")
 
     # Reset index
     df.reset_index(drop=True, inplace=True)
 
-    # Save cleaned DataFrame to parquet file
-    if save_path is None:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        save_path = f"data/processed/cleaned_movies_{timestamp}.parquet"
-
-    # Save cleaned DataFrame to parquet file
-    df.to_parquet(save_path, index=False)
-    print(f"✅ Cleaned DataFrame saved to {save_path}")
+    # Save to parquet file if save_path is provided
+    if save_path:
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        df.to_parquet(save_path, engine='pyarrow', index=False)
+        print(f"Cleaned data saved to {save_path}")
+    return df
 
 if __name__ == "__main__":
-    # Example usage
-    df = pd.read_json("data/raw/movies_20250407_154042.json", lines=True)
-    clean_data(df)
+    with open(f"data/latest_timestamp.txt", "r") as f:
+        latest_timestamp = f.read().strip()
+    raw_df = pd.read_json(f"data/raw/movies_{latest_timestamp}.json", lines=True)
 
-
-
-
+    save_path = f"data/processed/cleaned_movies_{latest_timestamp}.parquet"
+    cleaned_df = clean_data(raw_df, save_path)
+    print(cleaned_df.head())
 
 
 

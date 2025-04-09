@@ -10,3 +10,5 @@ data/processed/*
 __init__.py
 data_venv/
 data/*
+.history
+reports/figures/*
