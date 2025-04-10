@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
-import os
-
+import os    
 
 def clean_data(df, save_path=None):
     """Clean and preprocess the movie Dataframe."""

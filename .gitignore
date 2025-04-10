@@ -12,3 +12,4 @@ data_venv/
 data/*
 .history
 reports/figures/*
+notebooks/reports/*

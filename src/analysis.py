@@ -13,7 +13,7 @@ def rank_movies(df, metric, ascending=False, min_votes=10, min_budget=10):
 
 def perform_analysis(df):
     df['profit_musd'] = (df['revenue_musd'] - df['budget_musd']).round(2)
-    df['roi'] = (((df['revenue_musd'] - df['budget_musd']) / df['budget_musd']) * 100).round(2)
+    df['roi'] = (df['revenue_musd'] - df['budget_musd']).round(2)
 
     # Identify best and worst movies 
     kpis = {
